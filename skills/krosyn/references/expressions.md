@@ -1,9 +1,12 @@
 # Krosyn expressions
 
 Every value in a connector (trigger, URLs, headers, query parameters, process fields, perform
-body) is an expression. `list_functions` returns the authoritative function list for the
-server you are connected to; `validate_expression` checks syntax and `test_expression`
-evaluates against sample data.
+body) is an expression. `validate_expression` checks syntax and `test_expression` evaluates
+against sample data.
+
+This page covers the syntax and the pitfalls. It is not the complete function list: call
+`list_functions` for the live list, and see https://krosyn.com/docs/expressions for every
+signature.
 
 ## Syntax
 
@@ -46,12 +49,14 @@ text: `2026-07-31`, `+1-800-555-0100` and `ORD-1001` are not arithmetic.
 | comparison | `equals notEquals neq contains greaterThan gt lessThan lt gte lte` |
 | logical | `and or not` |
 | math | `add subtract multiply divide modulo round ceil floor abs min max` |
-| array | `join count first last includes map filter flatten unique sort sum` |
+| decimal | `decimalAdd decimalSubtract decimalMultiply decimalDivide decimalRound decimalSum decimalCompare` |
+| array | `join count first last includes map filter flatten unique sort sum groupBy toCsv` |
 | date | `now formatDate timestamp dateDiff` |
 | type | `toNumber toString toBoolean isNull isEmpty` |
 | fallback | `default coalesce` |
 
-Names are case-sensitive.
+Names are case-sensitive. Use the `decimal*` functions for money, where floating-point
+rounding is not acceptable. This table was correct when written; `list_functions` is the live list.
 
 ### Argument order
 
@@ -96,7 +101,7 @@ similar) cannot be read through `map` and `filter`.
 
 ## Examples
 
-Trigger only for paid orders above zero:
+Trigger only for new orders with a total above zero:
 
 ```
 $payload.type == 'order.created' && $payload.total > 0
